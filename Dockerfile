@@ -8,6 +8,7 @@ WORKDIR /app
 COPY go.mod ./
 COPY go.sum ./
 COPY CMD ./
+COPY domain ./
 
 # Download dependencies
 RUN go build -o /server
