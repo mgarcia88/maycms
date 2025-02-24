@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/mgarcia88/maycms/domain"
+)
+
+var c = domain.NewContent()
 
 func main() {
-	fmt.Printf("Helloo worlldd")
+	c.ContentText = "Lorem ipsum lorem ipsum lorem ipsum"
+	c.Title = "Lorem ipsum"
+	fmt.Println(c.ContentText)
+	fmt.Println(c.Title)
+
 }
