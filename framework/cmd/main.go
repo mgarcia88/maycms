@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/mgarcia88/maycms/domain"
+	"maycms/domain"
 )
 
-var c = domain.NewContent()
+var c = domain.Content{}
 
 func main() {
 	c.ContentText = "Lorem ipsum lorem ipsum lorem ipsum"

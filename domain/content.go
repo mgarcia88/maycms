@@ -7,12 +7,12 @@ import (
 )
 
 type Content struct {
-	ID          string    `valid:"uuid"`
-	Title       string    `valid:"notnull"`
-	ContentText string    `valid:"notnull"`
-	Status      string    `valid:"notnull"`
-	CreatedAt   time.Time `valid:"-"`
-	UpdatedAt   time.Time `valid:"-"`
+	ID          string
+	Title       string
+	ContentText string
+	Status      string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func init() {
