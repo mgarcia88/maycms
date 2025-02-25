@@ -5,9 +5,10 @@ FROM golang:1.24.0-alpine AS build
 WORKDIR /app
 
 # Copy go.mod and go.sum files
+COPY framework ./
+COPY domain /app/
 COPY go.mod ./
 COPY go.sum ./
-COPY CMD ./
 
 # Download dependencies
 RUN go build -o /server
