@@ -1,0 +1,14 @@
+services:
+  may-db:
+    container_name: may-db
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=a12345z
+      - POSTGRES_USER=gon
+      - POSTGRES_DB=maycms-db
+    ports: 
+      - "5432:5432"
+    volumes: 
+      - pgdata:/var/lib/postgressql/data
+volumes:
+  pgdata: {}

@@ -5,10 +5,10 @@ FROM golang:1.24.0-alpine AS build
 WORKDIR /app
 
 # Copy go.mod and go.sum files
-COPY framework ./
+COPY framework /app/
 COPY domain /app/
-COPY go.mod ./
-COPY go.sum ./
+COPY go.mod /app/
+COPY go.sum /app/
 
 # Download dependencies
 RUN go build -o /server
@@ -20,7 +20,5 @@ WORKDIR /
 COPY --from=build /server /server
 
 EXPOSE 8080
-
-USER nonroot:nonroot
 
 ENTRYPOINT [ "/server" ]
