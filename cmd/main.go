@@ -1,7 +1,7 @@
 package main
 
 import (
-	"maycms/internal/interfaces"
+	"maycms/internal/adapters/drivers/api"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,8 +9,9 @@ import (
 func main() {
 	server := gin.Default()
 
-	contentHandler := interfaces.NewContentHandler()
+	contentHandler := api.NewContentHandler()
 	server.GET("/contents", contentHandler.GetContentHandler)
+	server.GET("/contents/:id", contentHandler.GetContentByIDHandler)
 
 	server.Run(":8000")
 }
