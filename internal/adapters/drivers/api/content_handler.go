@@ -17,13 +17,8 @@ func NewContentHandler(s application.ContentService) *ContentHandler {
 }
 
 func (h *ContentHandler) GetContentHandler(c *gin.Context) {
-
-	/*contentRepository := repositories.NewContentRepository()
-
-	mockContent := contentRepository.GetAllContents()
-
-	// Return the order as JSON
-	c.JSON(http.StatusOK, mockContent)*/
+	contents := h.service.GetAllContents()
+	c.JSON(http.StatusOK, contents)
 }
 
 func (h *ContentHandler) GetContentByIDHandler(c *gin.Context) {

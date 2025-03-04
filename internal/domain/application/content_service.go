@@ -18,3 +18,9 @@ func (c *ContentService) GetContentById(id int) *entities.Content {
 
 	return content
 }
+
+func (c *ContentService) GetAllContents() *[]entities.Content {
+	contents := c.repo.GetAllContents()
+
+	return contents
+}
