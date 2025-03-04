@@ -11,6 +11,12 @@ type PostgresDatabase struct {
 }
 
 // Query implements data.Database.
+func (p *PostgresDatabase) Query(db *sql.DB, q string) (*sql.Rows, error) {
+	rows, err := db.Query(q)
+	return rows, err
+}
+
+// Query implements data.Database.
 func (p *PostgresDatabase) QueryRow(db *sql.DB, q string, id int) *sql.Row {
 	row := db.QueryRow(q, id)
 	return row

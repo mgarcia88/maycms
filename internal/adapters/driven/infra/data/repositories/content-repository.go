@@ -3,7 +3,6 @@ package repositories
 import (
 	data "maycms/internal/adapters/driven/infra/data/interfaces"
 	"maycms/internal/domain/entities"
-	"time"
 )
 
 type ContentRepository struct {
@@ -33,10 +32,35 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 	return &content
 }
 
-func (c ContentRepository) GetAllContents() []entities.Content {
-	mockContent := []entities.Content{
-		1: {ID: 1, Title: "Meu primeiro conteudo", ContentText: "Lorem ipsum", CreatedAt: time.Now(), UpdatedAt: time.Now()},
-		2: {ID: 2, Title: "Meu segundo conteudo", ContentText: "Lorem ipsum", CreatedAt: time.Now(), UpdatedAt: time.Now()},
+func (c ContentRepository) GetAllContents() *[]entities.Content {
+	var contents []entities.Content
+	con, err := c.db.OpenConnection()
+
+	if err != nil {
+		panic("Não foi possível conectar")
 	}
-	return mockContent
+
+	query := "SELECT id, title, content_text, status FROM public.content"
+
+	rows, err := c.db.Query(con, query)
+
+	if err != nil {
+		panic("Erro ao buscar os conteúdos")
+	}
+
+	for rows.Next() {
+		var content entities.Content
+
+		err = rows.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status)
+
+		if err != nil {
+			continue
+		}
+
+		contents = append(contents, content)
+	}
+
+	c.db.CloseConnection(con)
+
+	return &contents
 }
