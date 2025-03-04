@@ -1,7 +1,7 @@
 package api
 
 import (
-	"maycms/internal/adapters/driven/infra/repositories"
+	"maycms/internal/domain/application"
 	"net/http"
 	"strconv"
 
@@ -9,31 +9,32 @@ import (
 )
 
 type ContentHandler struct {
+	service application.ContentService
 }
 
-func NewContentHandler() *ContentHandler {
-	return &ContentHandler{}
+func NewContentHandler(s application.ContentService) *ContentHandler {
+	return &ContentHandler{service: s}
 }
 
 func (h *ContentHandler) GetContentHandler(c *gin.Context) {
-	contentRepository := repositories.NewContentRepository()
+
+	/*contentRepository := repositories.NewContentRepository()
 
 	mockContent := contentRepository.GetAllContents()
 
 	// Return the order as JSON
-	c.JSON(http.StatusOK, mockContent)
+	c.JSON(http.StatusOK, mockContent)*/
 }
 
 func (h *ContentHandler) GetContentByIDHandler(c *gin.Context) {
-	contentRepository := repositories.NewContentRepository()
+
 	id, err := strconv.Atoi(c.Params.ByName("id"))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "")
 	}
 
-	mockContent := contentRepository.GetContentById(id)
+	result := h.service.GetContentById(id)
+	c.JSON(http.StatusOK, result)
 
-	// Return the order as JSON
-	c.JSON(http.StatusOK, mockContent)
 }

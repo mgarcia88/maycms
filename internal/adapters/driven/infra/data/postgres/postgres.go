@@ -1,0 +1,39 @@
+package postgres
+
+import (
+	"database/sql"
+	"fmt"
+
+	_ "github.com/lib/pq"
+)
+
+type PostgresDatabase struct {
+}
+
+// Query implements data.Database.
+func (p *PostgresDatabase) QueryRow(db *sql.DB, q string, id int) *sql.Row {
+	row := db.QueryRow(q, id)
+	return row
+}
+
+// CloseConnection implements data.Database.
+func (p *PostgresDatabase) CloseConnection(db *sql.DB) {
+	db.Close()
+}
+
+// OpenConnection implements data.Database.
+func (p *PostgresDatabase) OpenConnection() (*sql.DB, error) {
+	dsn := "postgres://gon:a12345z@localhost:5432/maycms-db?sslmode=disable"
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	err = db.Ping()
+
+	return db, err
+}
+
+func NewPostgresDB() *PostgresDatabase {
+	return &PostgresDatabase{}
+}
