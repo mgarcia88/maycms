@@ -1,6 +1,9 @@
 package entities
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Content struct {
 	ID          int
@@ -11,6 +14,18 @@ type Content struct {
 	Status      string
 }
 
-func NewContent() *Content {
-	return &Content{}
+func NewContent(t string, ct string, s string) (*Content, error) {
+	if t == "" || len(t) < 10 {
+		return &Content{}, errors.New("título inválido")
+	}
+
+	if ct == "" || len(ct) < 20 {
+		return &Content{}, errors.New("conteúdo inválido")
+	}
+
+	if s == "" || len(s) < 5 {
+		return &Content{}, errors.New("status inválido")
+	}
+
+	return &Content{Title: t, ContentText: ct, Status: s}, nil
 }

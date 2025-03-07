@@ -64,3 +64,23 @@ func (c ContentRepository) GetAllContents() *[]entities.Content {
 
 	return &contents
 }
+
+func (c ContentRepository) CreateContent(cont *entities.Content) error {
+
+	con, err := c.db.OpenConnection()
+	if err != nil {
+		panic("Não foi possível conectar")
+	}
+
+	query := "INSERT INTO public.content (title, content_text, status) VALUES($1, $2, $3);"
+
+	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status)
+
+	c.db.CloseConnection(con)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
