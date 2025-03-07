@@ -24,3 +24,9 @@ func (c *ContentService) GetAllContents() *[]entities.Content {
 
 	return contents
 }
+
+func (c *ContentService) CreateContent(cont *entities.Content) error {
+	err := c.repo.CreateContent(cont)
+
+	return err
+}

@@ -3,11 +3,18 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"maycms/internal/domain/entities"
 
 	_ "github.com/lib/pq"
 )
 
 type PostgresDatabase struct {
+}
+
+// Exec implements data.Database.
+func (p *PostgresDatabase) Exec(db *sql.DB, q string, c entities.Content) error {
+	_, err := db.Exec(q, c.Title, c.ContentText, c.Status)
+	return err
 }
 
 // Query implements data.Database.
