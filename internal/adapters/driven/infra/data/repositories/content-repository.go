@@ -1,15 +1,15 @@
 package repositories
 
 import (
-	data "maycms/internal/adapters/driven/infra/data/interfaces"
+	ports "maycms/Internal/Domain/Ports/Driven"
 	"maycms/internal/domain/entities"
 )
 
 type ContentRepository struct {
-	db data.Database
+	db ports.Database
 }
 
-func NewContentRepository(db data.Database) *ContentRepository {
+func NewContentRepository(db ports.Database) *ContentRepository {
 	return &ContentRepository{db: db}
 }
 
