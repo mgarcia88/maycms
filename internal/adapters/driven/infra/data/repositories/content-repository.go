@@ -21,11 +21,11 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 		panic("Não foi possível conectar")
 	}
 
-	query := "SELECT id, title, content_text, status FROM public.contents WHERE id = $1"
+	query := "SELECT id, title, content_text, status, created_at, updated_at, status FROM public.contents WHERE id = $1"
 
 	row := c.db.QueryRow(con, query, id)
 
-	row.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status)
+	row.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt)
 
 	c.db.CloseConnection(con)
 
@@ -40,7 +40,7 @@ func (c ContentRepository) GetAllContents() *[]entities.Content {
 		panic("Não foi possível conectar")
 	}
 
-	query := "SELECT id, title, content_text, status FROM public.contents"
+	query := "SELECT id, title, content_text, status, created_at, updated_at FROM public.contents"
 
 	rows, err := c.db.Query(con, query)
 
@@ -51,7 +51,7 @@ func (c ContentRepository) GetAllContents() *[]entities.Content {
 	for rows.Next() {
 		var content entities.Content
 
-		err = rows.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status)
+		err = rows.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt)
 
 		if err != nil {
 			continue
