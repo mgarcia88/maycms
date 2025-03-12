@@ -21,7 +21,7 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 		panic("Não foi possível conectar")
 	}
 
-	query := "SELECT id, title, content_text, status FROM public.content WHERE id = $1"
+	query := "SELECT id, title, content_text, status FROM public.contents WHERE id = $1"
 
 	row := c.db.QueryRow(con, query, id)
 
@@ -40,7 +40,7 @@ func (c ContentRepository) GetAllContents() *[]entities.Content {
 		panic("Não foi possível conectar")
 	}
 
-	query := "SELECT id, title, content_text, status FROM public.content"
+	query := "SELECT id, title, content_text, status FROM public.contents"
 
 	rows, err := c.db.Query(con, query)
 
@@ -72,7 +72,7 @@ func (c ContentRepository) CreateContent(cont *entities.Content) error {
 		panic("Não foi possível conectar")
 	}
 
-	query := "INSERT INTO public.content (title, content_text, status) VALUES($1, $2, $3);"
+	query := "INSERT INTO public.contents (title, content_text, status) VALUES($1, $2, $3);"
 
 	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status)
 
