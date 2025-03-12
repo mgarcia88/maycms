@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"maycms/internal/domain/entities"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -36,7 +37,11 @@ func (p *PostgresDatabase) CloseConnection(db *sql.DB) {
 
 // OpenConnection implements ports.Database.
 func (p *PostgresDatabase) OpenConnection() (*sql.DB, error) {
-	dsn := "postgres://gon:a12345z@localhost:5432/maycms-db?sslmode=disable"
+	dsn := os.Getenv("DSN")
+
+	if dsn == "" {
+		panic("Failed recovering the environment variables")
+	}
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
