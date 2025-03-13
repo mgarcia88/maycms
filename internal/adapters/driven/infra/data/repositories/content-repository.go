@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"log"
 	ports "maycms/Internal/Domain/Ports/Driven"
 	"maycms/internal/domain/entities"
 )
@@ -18,16 +19,16 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 	con, err := c.db.OpenConnection()
 
 	if err != nil {
-		panic("Não foi possível conectar")
+		log.Fatal("Não foi possível conectar")
 	}
 
-	query := "SELECT id, title, content_text, status, created_at, updated_at, status FROM public.contents WHERE id = $1"
+	query := "SELECT id, title, content_text, status, created_at, updated_at FROM public.contents WHERE id = $1"
+
+	defer c.db.CloseConnection(con)
 
 	row := c.db.QueryRow(con, query, id)
 
 	row.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt)
-
-	c.db.CloseConnection(con)
 
 	return &content
 }
@@ -37,15 +38,17 @@ func (c ContentRepository) GetAllContents() *[]entities.Content {
 	con, err := c.db.OpenConnection()
 
 	if err != nil {
-		panic("Não foi possível conectar")
+		log.Fatal("Não foi possível conectar")
 	}
 
 	query := "SELECT id, title, content_text, status, created_at, updated_at FROM public.contents"
 
+	defer c.db.CloseConnection(con)
+
 	rows, err := c.db.Query(con, query)
 
 	if err != nil {
-		panic("Erro ao buscar os conteúdos")
+		log.Fatal("Não foi possível conectar")
 	}
 
 	for rows.Next() {
@@ -60,8 +63,6 @@ func (c ContentRepository) GetAllContents() *[]entities.Content {
 		contents = append(contents, content)
 	}
 
-	c.db.CloseConnection(con)
-
 	return &contents
 }
 
@@ -69,14 +70,14 @@ func (c ContentRepository) CreateContent(cont *entities.Content) error {
 
 	con, err := c.db.OpenConnection()
 	if err != nil {
-		panic("Não foi possível conectar")
+		log.Fatal("Não foi possível conectar")
 	}
 
 	query := "INSERT INTO public.contents (title, content_text, status) VALUES($1, $2, $3);"
 
-	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status)
+	defer c.db.CloseConnection(con)
 
-	c.db.CloseConnection(con)
+	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status)
 
 	if err != nil {
 		return err
