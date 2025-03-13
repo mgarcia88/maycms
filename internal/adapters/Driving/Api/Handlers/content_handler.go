@@ -29,9 +29,15 @@ func (h *ContentHandler) GetContentByIDHandler(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "")
+		return
 	}
 
 	result := h.service.GetContentById(id)
+
+	if result.ContentText == "" {
+		c.JSON(http.StatusNotFound, "Conteúdo não existe")
+		return
+	}
 	c.JSON(http.StatusOK, result)
 
 }

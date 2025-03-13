@@ -42,6 +42,7 @@ func (p *PostgresDatabase) OpenConnection() (*sql.DB, error) {
 	if dsn == "" {
 		panic("Failed recovering the environment variables")
 	}
+
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
