@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"log"
-	ports "maycms/Internal/Domain/Ports/Driven"
-	"maycms/internal/domain/entities"
+	entities "maycms/internal/domain/entities"
+	ports "maycms/internal/domain/ports/driven"
 )
 
 type ContentRepository struct {
