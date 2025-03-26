@@ -3,7 +3,6 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"maycms/internal/domain/entities"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -13,8 +12,8 @@ type PostgresDatabase struct {
 }
 
 // Exec implements ports.Database.
-func (p *PostgresDatabase) Exec(db *sql.DB, q string, c entities.Content) error {
-	_, err := db.Exec(q, c.Title, c.ContentText, c.Status)
+func (p *PostgresDatabase) Exec(db *sql.DB, q string, args ...any) error {
+	_, err := db.Exec(q, args...)
 	return err
 }
 
