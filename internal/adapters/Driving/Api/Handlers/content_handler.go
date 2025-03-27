@@ -1,7 +1,7 @@
 package api
 
 import (
-	DTO "maycms/Internal/Adapters/Driving/Api/DTOs"
+	DTO "maycms/internal/adapters/driving/api/DTOs"
 	"maycms/internal/domain/application"
 	"maycms/internal/domain/entities"
 	"net/http"

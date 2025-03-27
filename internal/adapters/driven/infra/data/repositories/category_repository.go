@@ -24,7 +24,7 @@ func (c CategoryRepository) CreateCategory(cat entities.Category) error {
 
 	defer c.db.CloseConnection(con)
 
-	_, err = con.Exec(query, cat.Title, cat.Title)
+	_, err = con.Exec(query, cat.Title, cat.Description)
 
 	if err != nil {
 		return err
