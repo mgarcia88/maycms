@@ -13,7 +13,7 @@ type Category struct {
 	UpdatedAt   time.Time
 }
 
-func NewCategorie(t string, d string) (*Category, error) {
+func NewCategory(t string, d string) (*Category, error) {
 	if t == "" || len(t) < 10 {
 		return &Category{}, errors.New("título inválido")
 	}

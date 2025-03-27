@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	api "maycms/Internal/Adapters/Driving/Api/Handlers"
 	"maycms/internal/adapters/driven/infra/data/postgres"
 	"maycms/internal/adapters/driven/infra/data/repositories"
+	api "maycms/internal/adapters/driving/api/handlers"
 	"os"
 
 	"maycms/internal/domain/application"
@@ -21,12 +21,19 @@ func main() {
 
 	db := postgres.NewPostgresDB()
 	contentRepo := repositories.NewContentRepository(db)
+	categoryRepo := repositories.NewCategoryRepository(db)
+
 	contentService := application.NewContentService(*contentRepo)
+	categoryService := application.NewCategoryService(*categoryRepo)
 
 	contentHandler := api.NewContentHandler(*contentService)
+	categoryHandler := api.NewCategoryHandler(*categoryService)
+
 	server.GET("/contents", contentHandler.GetContentHandler)
 	server.GET("/contents/:id", contentHandler.GetContentByIDHandler)
 	server.POST("/contents", contentHandler.CreateContentHandler)
+
+	server.POST("/categories", categoryHandler.CreateCategoryHandler)
 
 	server.Run(":8000")
 }
