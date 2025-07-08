@@ -33,7 +33,7 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 	return &content
 }
 
-func (c ContentRepository) GetAllContents() *[]entities.Content {
+func (c ContentRepository) GetAllContents() []entities.Content {
 	var contents []entities.Content
 	con, err := c.db.OpenConnection()
 
@@ -63,7 +63,7 @@ func (c ContentRepository) GetAllContents() *[]entities.Content {
 		contents = append(contents, content)
 	}
 
-	return &contents
+	return contents
 }
 
 func (c ContentRepository) CreateContent(cont *entities.Content) error {

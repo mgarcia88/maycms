@@ -2,7 +2,7 @@ package api
 
 import (
 	DTO "maycms/internal/adapters/driving/api/DTOs"
-	"maycms/internal/domain/application"
+	"maycms/internal/application"
 	"maycms/internal/domain/entities"
 	"net/http"
 	"strconv"
