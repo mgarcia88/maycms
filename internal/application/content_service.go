@@ -1,23 +1,25 @@
 package application
 
 import (
-	"maycms/internal/adapters/driven/infra/data/repositories"
 	"maycms/internal/domain/entities"
 	"maycms/internal/domain/usecases"
 )
 
 type ContentService struct {
-	repo                  repositories.ContentRepository
 	getAllContentsUseCase usecases.GetAllContentsUseCase
 	getContentByIdUseCase usecases.GetContentByIdUseCase
+	postContentUseCase    usecases.PostContentUseCase
 }
 
-func NewContentService(repo repositories.ContentRepository,
+func NewContentService(
 	getAllContentsUseCase usecases.GetAllContentsUseCase,
-	getContentByIdUsesCase usecases.GetContentByIdUseCase) *ContentService {
-	return &ContentService{repo: repo,
+	getContentByIdUsesCase usecases.GetContentByIdUseCase,
+	postContentUseCase usecases.PostContentUseCase,
+) *ContentService {
+	return &ContentService{
 		getAllContentsUseCase: getAllContentsUseCase,
 		getContentByIdUseCase: getContentByIdUsesCase,
+		postContentUseCase:    postContentUseCase,
 	}
 }
 
@@ -34,7 +36,7 @@ func (c *ContentService) GetAllContents() *[]entities.Content {
 }
 
 func (c *ContentService) CreateContent(cont *entities.Content) error {
-	err := c.repo.CreateContent(cont)
+	err := c.postContentUseCase.Execute(cont)
 
 	return err
 }

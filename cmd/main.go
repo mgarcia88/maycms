@@ -26,8 +26,13 @@ func main() {
 
 	getAllContentsUseCase := usecases.NewGetAllContentsUseCase(*contentRepo)
 	getContentByIdUseCase := usecases.NewGetContentByIdUseCase(*contentRepo)
+	postContentUseCase := usecases.NewPostContentUseCase(*contentRepo)
 
-	contentService := application.NewContentService(*contentRepo, *getAllContentsUseCase, *getContentByIdUseCase)
+	contentService := application.NewContentService(
+		*getAllContentsUseCase,
+		*getContentByIdUseCase,
+		*postContentUseCase)
+
 	categoryService := application.NewCategoryService(*categoryRepo)
 
 	contentHandler := api.NewContentHandler(*contentService)
