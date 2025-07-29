@@ -5,9 +5,10 @@ import (
 	"maycms/internal/adapters/driven/infra/data/postgres"
 	"maycms/internal/adapters/driven/infra/data/repositories"
 	api "maycms/internal/adapters/driving/api/handlers"
+	"maycms/internal/domain/usecases"
 	"os"
 
-	"maycms/internal/domain/application"
+	"maycms/internal/application"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -23,7 +24,15 @@ func main() {
 	contentRepo := repositories.NewContentRepository(db)
 	categoryRepo := repositories.NewCategoryRepository(db)
 
-	contentService := application.NewContentService(*contentRepo)
+	getAllContentsUseCase := usecases.NewGetAllContentsUseCase(*contentRepo)
+	getContentByIdUseCase := usecases.NewGetContentByIdUseCase(*contentRepo)
+	postContentUseCase := usecases.NewPostContentUseCase(*contentRepo)
+
+	contentService := application.NewContentService(
+		*getAllContentsUseCase,
+		*getContentByIdUseCase,
+		*postContentUseCase)
+
 	categoryService := application.NewCategoryService(*categoryRepo)
 
 	contentHandler := api.NewContentHandler(*contentService)
@@ -35,5 +44,5 @@ func main() {
 
 	server.POST("/categories", categoryHandler.CreateCategoryHandler)
 
-	server.Run(":8000")
+	server.Run(":8080")
 }
