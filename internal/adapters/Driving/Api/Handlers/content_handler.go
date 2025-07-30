@@ -2,8 +2,8 @@ package api
 
 import (
 	DTO "maycms/internal/adapters/driving/api/DTOs"
-	"maycms/internal/application"
 	"maycms/internal/domain/entities"
+	"maycms/internal/domain/usecases"
 	"net/http"
 	"strconv"
 
@@ -11,15 +11,25 @@ import (
 )
 
 type ContentHandler struct {
-	service application.ContentService
+	getAllContentsUseCase usecases.GetAllContentsUseCase
+	getContentByIdUseCase usecases.GetContentByIdUseCase
+	postContentUseCase    usecases.PostContentUseCase
 }
 
-func NewContentHandler(s application.ContentService) *ContentHandler {
-	return &ContentHandler{service: s}
+func NewContentHandler(
+	getAll usecases.GetAllContentsUseCase,
+	getByID usecases.GetContentByIdUseCase,
+	post usecases.PostContentUseCase,
+) *ContentHandler {
+	return &ContentHandler{
+		getAllContentsUseCase: getAll,
+		getContentByIdUseCase: getByID,
+		postContentUseCase:    post,
+	}
 }
 
-func (h *ContentHandler) GetContentHandler(c *gin.Context) {
-	contents, err := h.service.GetAllContents()
+func (h *ContentHandler) HandleGetAll(c *gin.Context) {
+	contents, err := h.getAllContentsUseCase.Execute()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve contents"})
@@ -33,7 +43,7 @@ func (h *ContentHandler) GetContentHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, contents)
 }
 
-func (h *ContentHandler) GetContentByIDHandler(c *gin.Context) {
+func (h *ContentHandler) HandleGetById(c *gin.Context) {
 
 	id, err := strconv.Atoi(c.Params.ByName("id"))
 
@@ -42,7 +52,7 @@ func (h *ContentHandler) GetContentByIDHandler(c *gin.Context) {
 		return
 	}
 
-	result := h.service.GetContentById(id)
+	result, _ := h.getContentByIdUseCase.Execute(id)
 
 	if result.ContentText == "" {
 		c.JSON(http.StatusNotFound, "Conteúdo não existe")
@@ -52,7 +62,7 @@ func (h *ContentHandler) GetContentByIDHandler(c *gin.Context) {
 
 }
 
-func (h *ContentHandler) CreateContentHandler(c *gin.Context) {
+func (h *ContentHandler) HandleCreate(c *gin.Context) {
 	var createContentDTO DTO.ContentRequestBody
 
 	if err := c.ShouldBindJSON(&createContentDTO); err != nil {
@@ -67,7 +77,7 @@ func (h *ContentHandler) CreateContentHandler(c *gin.Context) {
 		return
 	}
 
-	err = h.service.CreateContent(content)
+	err = h.postContentUseCase.Execute(content)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -8,8 +8,6 @@ import (
 	"maycms/internal/domain/usecases"
 	"os"
 
-	"maycms/internal/application"
-
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -22,27 +20,19 @@ func main() {
 
 	db := postgres.NewPostgresDB()
 	contentRepo := repositories.NewContentRepository(db)
-	categoryRepo := repositories.NewCategoryRepository(db)
 
 	getAllContentsUseCase := usecases.NewGetAllContentsUseCase(*contentRepo)
 	getContentByIdUseCase := usecases.NewGetContentByIdUseCase(*contentRepo)
 	postContentUseCase := usecases.NewPostContentUseCase(*contentRepo)
 
-	contentService := application.NewContentService(
+	contentHandler := api.NewContentHandler(
 		*getAllContentsUseCase,
 		*getContentByIdUseCase,
 		*postContentUseCase)
 
-	categoryService := application.NewCategoryService(*categoryRepo)
-
-	contentHandler := api.NewContentHandler(*contentService)
-	categoryHandler := api.NewCategoryHandler(*categoryService)
-
-	server.GET("/contents", contentHandler.GetContentHandler)
-	server.GET("/contents/:id", contentHandler.GetContentByIDHandler)
-	server.POST("/contents", contentHandler.CreateContentHandler)
-
-	server.POST("/categories", categoryHandler.CreateCategoryHandler)
+	server.GET("/contents", contentHandler.HandleGetAll)
+	server.GET("/contents/:id", contentHandler.HandleGetById)
+	server.POST("/contents", contentHandler.HandleCreate)
 
 	server.Run(":8080")
 }
