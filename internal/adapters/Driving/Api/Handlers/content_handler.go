@@ -19,7 +19,17 @@ func NewContentHandler(s application.ContentService) *ContentHandler {
 }
 
 func (h *ContentHandler) GetContentHandler(c *gin.Context) {
-	contents := h.service.GetAllContents()
+	contents, err := h.service.GetAllContents()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve contents"})
+		return
+	}
+	if len(contents) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "No contents found"})
+		return
+	}
+	// Return the contents as JSON
 	c.JSON(http.StatusOK, contents)
 }
 
