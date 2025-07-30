@@ -29,10 +29,14 @@ func (c *ContentService) GetContentById(id int) *entities.Content {
 	return content
 }
 
-func (c *ContentService) GetAllContents() *[]entities.Content {
-	contents, _ := c.getAllContentsUseCase.Execute()
+func (c *ContentService) GetAllContents() []entities.Content {
+	contents, err := c.getAllContentsUseCase.Execute()
 
-	return &contents
+	if err != nil {
+		return nil
+	}
+
+	return contents
 }
 
 func (c *ContentService) CreateContent(cont *entities.Content) error {
