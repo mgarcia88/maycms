@@ -1,9 +1,10 @@
 package repositories
 
 import (
-	"log"
 	entities "maycms/internal/domain/entities"
 	ports "maycms/internal/domain/ports/driven"
+
+	"github.com/sirupsen/logrus"
 )
 
 type ContentRepository struct {
@@ -19,7 +20,9 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 	con, err := c.db.OpenConnection()
 
 	if err != nil {
-		log.Fatal("Não foi possível conectar")
+		logrus.WithFields(logrus.Fields{
+			"contentId": id,
+		}).Error("Failed to open database connection")
 	}
 
 	query := "SELECT id, title, content_text, status, created_at, updated_at FROM public.contents WHERE id = $1"
@@ -38,7 +41,7 @@ func (c ContentRepository) GetAllContents() []entities.Content {
 	con, err := c.db.OpenConnection()
 
 	if err != nil {
-		log.Fatal("Não foi possível conectar")
+		logrus.WithField("error", err).Error("Failed to open database connection")
 	}
 
 	query := "SELECT id, title, content_text, status, created_at, updated_at FROM public.contents"
@@ -48,7 +51,9 @@ func (c ContentRepository) GetAllContents() []entities.Content {
 	rows, err := c.db.Query(con, query)
 
 	if err != nil {
-		log.Fatal("Não foi possível conectar")
+		logrus.WithFields(logrus.Fields{
+			"allContents": "all",
+		}).Error("Failed to open database connection")
 	}
 
 	for rows.Next() {
@@ -57,6 +62,9 @@ func (c ContentRepository) GetAllContents() []entities.Content {
 		err = rows.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt)
 
 		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"contentList": content,
+			}).Error("Failed listing contents")
 			continue
 		}
 
@@ -70,7 +78,7 @@ func (c ContentRepository) CreateContent(cont *entities.Content) error {
 
 	con, err := c.db.OpenConnection()
 	if err != nil {
-		log.Fatal("Não foi possível conectar")
+		logrus.WithFields(logrus.Fields{"newContent": cont.Title}).Error("Failed to open database connection")
 	}
 
 	query := "INSERT INTO public.contents (title, content_text, status) VALUES($1, $2, $3);"
@@ -80,6 +88,9 @@ func (c ContentRepository) CreateContent(cont *entities.Content) error {
 	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status)
 
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"newContent": cont.Title,
+		}).Error("Failed creating content")
 		return err
 	}
 
