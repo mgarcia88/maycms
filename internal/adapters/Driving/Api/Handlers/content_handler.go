@@ -1,7 +1,7 @@
 package api
 
 import (
-	DTO "maycms/internal/adapters/driving/api/DTOs"
+	DTO "maycms/internal/adapters/driving/api/DTOs/content"
 	"maycms/internal/domain/entities"
 	"maycms/internal/domain/usecases"
 	"net/http"
@@ -39,8 +39,18 @@ func (h *ContentHandler) HandleGetAll(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "No contents found"})
 		return
 	}
+
+	var responses []DTO.ContentResponse
+	for _, content := range contents {
+		responses = append(responses, DTO.ContentResponse{
+			ID:          content.ID,
+			Title:       content.Title,
+			ContentText: content.ContentText,
+			Status:      content.Status,
+		})
+	}
 	// Return the contents as JSON
-	c.JSON(http.StatusOK, contents)
+	c.JSON(http.StatusOK, responses)
 }
 
 func (h *ContentHandler) HandleGetById(c *gin.Context) {
@@ -52,18 +62,26 @@ func (h *ContentHandler) HandleGetById(c *gin.Context) {
 		return
 	}
 
-	result, _ := h.getContentByIdUseCase.Execute(id)
+	content, err := h.getContentByIdUseCase.Execute(id)
 
-	if result.ContentText == "" {
-		c.JSON(http.StatusNotFound, "Conteúdo não existe")
+	if err != nil {
+		c.JSON(http.StatusNotFound, "No content found with the given ID")
 		return
 	}
+
+	result := DTO.ContentResponse{
+		ID:          content.ID,
+		Title:       content.Title,
+		ContentText: content.ContentText,
+		Status:      content.Status,
+	}
+
 	c.JSON(http.StatusOK, result)
 
 }
 
 func (h *ContentHandler) HandleCreate(c *gin.Context) {
-	var createContentDTO DTO.ContentRequestBody
+	var createContentDTO DTO.ContentRequest
 
 	if err := c.ShouldBindJSON(&createContentDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -84,5 +102,5 @@ func (h *ContentHandler) HandleCreate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, "Conteúdo inserido com sucesso")
+	c.JSON(http.StatusCreated, "Content created successfully")
 }
