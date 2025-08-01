@@ -47,6 +47,12 @@ func (h *ContentHandler) HandleGetAll(c *gin.Context) {
 			Title:       content.Title,
 			ContentText: content.ContentText,
 			Status:      content.Status,
+			MainImage:   content.MainImage,
+			User: DTO.ContentUserResponse{
+				ID:    content.User.ID,
+				Name:  content.User.Name,
+				Email: content.User.Email,
+			},
 		})
 	}
 	// Return the contents as JSON
@@ -74,6 +80,12 @@ func (h *ContentHandler) HandleGetById(c *gin.Context) {
 		Title:       content.Title,
 		ContentText: content.ContentText,
 		Status:      content.Status,
+		MainImage:   content.MainImage,
+		User: DTO.ContentUserResponse{
+			ID:    content.User.ID,
+			Name:  content.User.Name,
+			Email: content.User.Email,
+		}, // Placeholder for user name, should be fetched from user service or repository
 	}
 
 	c.JSON(http.StatusOK, result)
@@ -88,7 +100,9 @@ func (h *ContentHandler) HandleCreate(c *gin.Context) {
 		return
 	}
 
-	var content, err = entities.NewContent(createContentDTO.Title, createContentDTO.ContentText, createContentDTO.Status)
+	var content, err = entities.NewContent(createContentDTO.Title, createContentDTO.ContentText,
+		createContentDTO.Status,
+		entities.NewUserWithID(createContentDTO.UserId, "", ""), createContentDTO.MainImage)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

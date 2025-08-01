@@ -25,13 +25,13 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 		}).Error("Failed to open database connection")
 	}
 
-	query := "SELECT id, title, content_text, status, created_at, updated_at FROM public.contents WHERE id = $1"
+	query := "SELECT c.id, c.title, c.content_text, c.status, c.created_at, c.updated_at, c.main_image, c.user_id, u.name, u.email FROM public.contents c INNER JOIN public.users u on u.id = c.user_id WHERE c.id = $1"
 
 	defer c.db.CloseConnection(con)
 
 	row := c.db.QueryRow(con, query, id)
 
-	row.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt)
+	row.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt, &content.MainImage, &content.User.ID, &content.User.Name, &content.User.Email)
 
 	return &content
 }
@@ -44,7 +44,7 @@ func (c ContentRepository) GetAllContents() []entities.Content {
 		logrus.WithField("error", err).Error("Failed to open database connection")
 	}
 
-	query := "SELECT id, title, content_text, status, created_at, updated_at FROM public.contents"
+	query := "SELECT c.id, c.title, c.content_text, c.status, c.created_at, c.updated_at, c.main_image, c.user_id, u.name, u.email FROM public.contents c INNER JOIN public.users u on u.id = c.user_id"
 
 	defer c.db.CloseConnection(con)
 
@@ -59,7 +59,7 @@ func (c ContentRepository) GetAllContents() []entities.Content {
 	for rows.Next() {
 		var content entities.Content
 
-		err = rows.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt)
+		err = rows.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt, &content.MainImage, &content.User.ID, &content.User.Name, &content.User.Email)
 
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
@@ -81,11 +81,11 @@ func (c ContentRepository) CreateContent(cont *entities.Content) error {
 		logrus.WithFields(logrus.Fields{"newContent": cont.Title}).Error("Failed to open database connection")
 	}
 
-	query := "INSERT INTO public.contents (title, content_text, status) VALUES($1, $2, $3);"
+	query := "INSERT INTO public.contents (title, content_text, status, user_id, main_image) VALUES($1, $2, $3, $4, $5);"
 
 	defer c.db.CloseConnection(con)
 
-	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status)
+	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status, cont.User.ID, cont.MainImage)
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
