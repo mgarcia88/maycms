@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type ContentHandler struct {
@@ -32,6 +33,10 @@ func (h *ContentHandler) HandleGetAll(c *gin.Context) {
 	contents, err := h.getAllContentsUseCase.Execute()
 
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"newContent": "GetAllContents",
+		}).Error(err, "Failed getting all contents")
+
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve contents"})
 		return
 	}
@@ -71,6 +76,10 @@ func (h *ContentHandler) HandleGetById(c *gin.Context) {
 	content, err := h.getContentByIdUseCase.Execute(id)
 
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"Content": id,
+		}).Error(err, "Content not found")
+
 		c.JSON(http.StatusNotFound, "No content found with the given ID")
 		return
 	}
@@ -109,12 +118,16 @@ func (h *ContentHandler) HandleCreate(c *gin.Context) {
 		return
 	}
 
-	err = h.postContentUseCase.Execute(content)
+	createdContent, err := h.postContentUseCase.Execute(content)
 
 	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"newContent": content.Title,
+		}).Error(err, "Failed creating content")
+
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, "Content created successfully")
+	c.JSON(http.StatusCreated, createdContent)
 }
