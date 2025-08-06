@@ -15,14 +15,12 @@ func NewContentRepository(db ports.Database) *ContentRepository {
 	return &ContentRepository{db: db}
 }
 
-func (c ContentRepository) GetContentById(id int) *entities.Content {
+func (c ContentRepository) GetContentById(id int) (*entities.Content, error) {
 	var content entities.Content
 	con, err := c.db.OpenConnection()
 
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"contentId": id,
-		}).Error("Failed to open database connection")
+		return nil, err
 	}
 
 	query := "SELECT c.id, c.title, c.content_text, c.status, c.created_at, c.updated_at, c.main_image, c.user_id, u.name, u.email FROM public.contents c INNER JOIN public.users u on u.id = c.user_id WHERE c.id = $1"
@@ -33,15 +31,15 @@ func (c ContentRepository) GetContentById(id int) *entities.Content {
 
 	row.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt, &content.MainImage, &content.User.ID, &content.User.Name, &content.User.Email)
 
-	return &content
+	return &content, nil
 }
 
-func (c ContentRepository) GetAllContents() []entities.Content {
+func (c ContentRepository) GetAllContents() ([]entities.Content, error) {
 	var contents []entities.Content
 	con, err := c.db.OpenConnection()
 
 	if err != nil {
-		logrus.WithField("error", err).Error("Failed to open database connection")
+		return nil, err
 	}
 
 	query := "SELECT c.id, c.title, c.content_text, c.status, c.created_at, c.updated_at, c.main_image, c.user_id, u.name, u.email FROM public.contents c INNER JOIN public.users u on u.id = c.user_id"
@@ -51,9 +49,7 @@ func (c ContentRepository) GetAllContents() []entities.Content {
 	rows, err := c.db.Query(con, query)
 
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"allContents": "all",
-		}).Error("Failed to open database connection")
+		return nil, err
 	}
 
 	for rows.Next() {
@@ -64,35 +60,32 @@ func (c ContentRepository) GetAllContents() []entities.Content {
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"contentList": content,
-			}).Error("Failed listing contents")
+			}).Error(err, "Failed scanning content row")
 			continue
 		}
 
 		contents = append(contents, content)
 	}
 
-	return contents
+	return contents, nil
 }
 
-func (c ContentRepository) CreateContent(cont *entities.Content) error {
+func (c ContentRepository) CreateContent(cont *entities.Content) (entities.Content, error) {
 
 	con, err := c.db.OpenConnection()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"newContent": cont.Title}).Error("Failed to open database connection")
+		return *cont, err
 	}
 
-	query := "INSERT INTO public.contents (title, content_text, status, user_id, main_image) VALUES($1, $2, $3, $4, $5);"
+	query := "INSERT INTO public.contents (title, content_text, status, user_id, main_image) VALUES($1, $2, $3, $4, $5) RETURNING id;"
 
 	defer c.db.CloseConnection(con)
 
-	_, err = con.Exec(query, cont.Title, cont.ContentText, cont.Status, cont.User.ID, cont.MainImage)
+	err = con.QueryRow(query, cont.Title, cont.ContentText, cont.Status, cont.User.ID, cont.MainImage).Scan(&cont.ID)
 
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"newContent": cont.Title,
-		}).Error("Failed creating content")
-		return err
+		return *cont, err
 	}
 
-	return nil
+	return *cont, nil
 }

@@ -13,10 +13,10 @@ func NewPostContentUseCase(repo repositories.ContentRepository) *PostContentUseC
 	return &PostContentUseCase{repo: repo}
 }
 
-func (u *PostContentUseCase) Execute(content *entities.Content) error {
-	err := u.repo.CreateContent(content)
+func (u *PostContentUseCase) Execute(content *entities.Content) (entities.Content, error) {
+	cont, err := u.repo.CreateContent(content)
 	if err != nil {
-		return err
+		return cont, err
 	}
-	return nil
+	return cont, nil
 }

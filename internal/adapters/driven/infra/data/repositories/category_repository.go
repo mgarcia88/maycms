@@ -3,8 +3,6 @@ package repositories
 import (
 	"maycms/internal/domain/entities"
 	ports "maycms/internal/domain/ports/driven"
-
-	logrus "github.com/sirupsen/logrus"
 )
 
 type CategoryRepository struct {
@@ -18,10 +16,6 @@ func NewCategoryRepository(db ports.Database) *CategoryRepository {
 func (c CategoryRepository) CreateCategory(cat entities.Category) error {
 	con, err := c.db.OpenConnection()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"newCategory": cat.Title,
-		}).Error("Failed to open database connection")
-
 		return err
 	}
 

@@ -13,7 +13,11 @@ func NewGetAllContentsUseCase(repo repositories.ContentRepository) *GetAllConten
 	return &GetAllContentsUseCase{repo: repo}
 }
 func (u *GetAllContentsUseCase) Execute() ([]entities.Content, error) {
-	contents := u.repo.GetAllContents()
+	contents, err := u.repo.GetAllContents()
+
+	if err != nil {
+		return nil, err
+	}
 
 	return contents, nil
 }

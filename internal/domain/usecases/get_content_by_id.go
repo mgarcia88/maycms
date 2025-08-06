@@ -14,7 +14,10 @@ func NewGetContentByIdUseCase(repo repositories.ContentRepository) *GetContentBy
 }
 
 func (u *GetContentByIdUseCase) Execute(id int) (*entities.Content, error) {
-	content := u.repo.GetContentById(id)
+	content, err := u.repo.GetContentById(id)
+	if err != nil {
+		return nil, err
+	}
 
 	return content, nil
 }
