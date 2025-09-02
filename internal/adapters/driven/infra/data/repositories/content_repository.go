@@ -2,7 +2,7 @@ package repositories
 
 import (
 	entities "maycms/internal/domain/entities"
-	ports "maycms/internal/domain/ports/driven"
+	ports "maycms/internal/domain/ports"
 
 	"github.com/sirupsen/logrus"
 )
@@ -11,25 +11,39 @@ type ContentRepository struct {
 	db ports.Database
 }
 
-func NewContentRepository(db ports.Database) *ContentRepository {
-	return &ContentRepository{db: db}
+func NewContentRepository(db ports.Database) ContentRepository {
+	return ContentRepository{db: db}
 }
 
 func (c ContentRepository) GetContentById(id int) (*entities.Content, error) {
-	var content entities.Content
+
 	con, err := c.db.OpenConnection()
 
 	if err != nil {
 		return nil, err
 	}
 
-	query := "SELECT c.id, c.title, c.content_text, c.status, c.created_at, c.updated_at, c.main_image, c.user_id, u.name, u.email FROM public.contents c INNER JOIN public.users u on u.id = c.user_id WHERE c.id = $1"
-
 	defer c.db.CloseConnection(con)
 
-	row := c.db.QueryRow(con, query, id)
+	query := "SELECT c.id, c.title, c.content_text, c.status, c.created_at, c.updated_at, c.main_image, c.user_id, u.name, u.email FROM public.contents c INNER JOIN public.users u on u.id = c.user_id WHERE c.id = $1"
 
-	row.Scan(&content.ID, &content.Title, &content.ContentText, &content.Status, &content.CreatedAt, &content.UpdatedAt, &content.MainImage, &content.User.ID, &content.User.Name, &content.User.Email)
+	var content entities.Content
+
+	err = c.db.QueryRow(con, query, id).Scan(
+		&content.ID,
+		&content.Title,
+		&content.ContentText,
+		&content.Status,
+		&content.CreatedAt,
+		&content.UpdatedAt,
+		&content.MainImage,
+		&content.User.ID,
+		&content.User.Name,
+		&content.User.Email)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return &content, nil
 }
