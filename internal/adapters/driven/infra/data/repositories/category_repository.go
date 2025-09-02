@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"maycms/internal/domain/entities"
-	ports "maycms/internal/domain/ports/driven"
+	ports "maycms/internal/domain/ports"
 )
 
 type CategoryRepository struct {

@@ -19,9 +19,9 @@ func SetupServer() *gin.Engine {
 	contentRepo := repositories.NewContentRepository(db)
 
 	// Initialize use cases (domain logic)
-	getAllContents := usecases.NewGetAllContentsUseCase(*contentRepo)
-	getContentById := usecases.NewGetContentByIdUseCase(*contentRepo)
-	postContent := usecases.NewPostContentUseCase(*contentRepo)
+	getAllContents := usecases.NewGetAllContentsUseCase(contentRepo)
+	getContentById := usecases.NewGetContentByIdUseCase(contentRepo)
+	postContent := usecases.NewPostContentUseCase(contentRepo)
 
 	// Initialize API handlers (driving adapters)
 	contentHandler := api.NewContentHandler(
