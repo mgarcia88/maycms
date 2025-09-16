@@ -7,5 +7,7 @@ import (
 func main() {
 	// Setup and start the HTTP server
 	server := app.SetupServer()
-	server.Run(":8080")
+	if err := server.Run(":8080"); err != nil {
+		panic(err) // ou log.Fatal(err)
+	}
 }
