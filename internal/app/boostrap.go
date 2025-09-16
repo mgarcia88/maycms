@@ -12,10 +12,14 @@ import (
 
 func SetupServer() *gin.Engine {
 	// Load environment variables
-	godotenv.Load()
+	err := godotenv.Load()
+
+	if err != nil {
+		panic("Error loading .env file")
+	}
 
 	// Initialize DB (Could pass dsn here if needed)
-	db := postgres.NewPostgresDB()
+	db, _ := postgres.NewPostgresDB()
 	contentRepo := repositories.NewContentRepository(db)
 
 	// Initialize use cases (domain logic)

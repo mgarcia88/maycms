@@ -14,20 +14,15 @@ func NewCategoryRepository(db ports.Database) *CategoryRepository {
 }
 
 func (c CategoryRepository) CreateCategory(cat entities.Category) error {
-	con, err := c.db.OpenConnection()
-	if err != nil {
-		return err
-	}
+	con := c.db.GetDB()
 
 	query := "INSERT INTO public.categories (title, description) VALUES($1, $2);"
 
-	defer c.db.CloseConnection(con)
-
-	_, err = con.Exec(query, cat.Title, cat.Description)
+	_, err := con.Exec(query, cat.Title, cat.Description)
 
 	if err != nil {
 		return err
 	}
 
-	return err
+	return nil
 }

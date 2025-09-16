@@ -9,37 +9,13 @@ import (
 )
 
 type PostgresDatabase struct {
+	DB *sql.DB
 }
 
-// Exec implements ports.Database.
-func (p *PostgresDatabase) Exec(db *sql.DB, q string, args ...any) error {
-	_, err := db.Exec(q, args...)
-	return err
-}
-
-// Query implements ports.Database.
-func (p *PostgresDatabase) Query(db *sql.DB, q string) (*sql.Rows, error) {
-	rows, err := db.Query(q)
-	return rows, err
-}
-
-// Query implements ports.Database.
-func (p *PostgresDatabase) QueryRow(db *sql.DB, q string, id int) *sql.Row {
-	row := db.QueryRow(q, id)
-	return row
-}
-
-// CloseConnection implements ports.Database.
-func (p *PostgresDatabase) CloseConnection(db *sql.DB) {
-	db.Close()
-}
-
-// OpenConnection implements ports.Database.
-func (p *PostgresDatabase) OpenConnection() (*sql.DB, error) {
+func NewPostgresDB() (*PostgresDatabase, error) {
 	dsn := os.Getenv("DSN")
-
 	if dsn == "" {
-		panic("Failed recovering the environment variables")
+		return nil, fmt.Errorf("missing DSN environment variable")
 	}
 
 	db, err := sql.Open("postgres", dsn)
@@ -47,11 +23,17 @@ func (p *PostgresDatabase) OpenConnection() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	err = db.Ping()
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
 
-	return db, err
+	return &PostgresDatabase{DB: db}, nil
 }
 
-func NewPostgresDB() *PostgresDatabase {
-	return &PostgresDatabase{}
+func (p *PostgresDatabase) Close() error {
+	return p.DB.Close()
+}
+
+func (p *PostgresDatabase) GetDB() *sql.DB {
+	return p.DB
 }
